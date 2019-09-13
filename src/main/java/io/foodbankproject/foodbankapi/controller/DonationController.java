@@ -20,12 +20,12 @@ public class DonationController {
 	private DonationRepository donationRepository;
 	
 	@GetMapping("/donations")
-	public List<Donation> getAll() {
+	public List<Donation> getAllDonations() {
 		return donationRepository.findAll();
 	}
 	
 	@GetMapping("donations/{id}")
-	public Donation getOne(@PathVariable("id") Integer id) {
+	public Donation getOneDonation(@PathVariable("id") Integer id) {
 		//TODO: Validate that we have an item present at that id
 		//Hint, look at methods available on donationRepository
 		
