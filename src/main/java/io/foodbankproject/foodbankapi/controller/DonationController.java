@@ -1,5 +1,7 @@
 package io.foodbankproject.foodbankapi.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,18 +13,18 @@ import io.foodbankproject.foodbankapi.entity.Donation;
 import io.foodbankproject.foodbankapi.entity.Item;
 import io.foodbankproject.foodbankapi.repository.DonationRepository;
 
-@RestController("/donations")
+@RestController()
 public class DonationController {
 
 	@Autowired
 	private DonationRepository donationRepository;
 	
-	@GetMapping("/getAll")
-	public Iterable<Donation> getAll() {
+	@GetMapping("/donations")
+	public List<Donation> getAll() {
 		return donationRepository.findAll();
 	}
 	
-	@GetMapping("/{id}")
+	@GetMapping("donations/{id}")
 	public Donation getOne(@PathVariable("id") Integer id) {
 		//TODO: Validate that we have an item present at that id
 		//Hint, look at methods available on donationRepository

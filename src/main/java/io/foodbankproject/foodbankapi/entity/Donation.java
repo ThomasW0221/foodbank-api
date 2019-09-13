@@ -10,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 public class Donation {
 
@@ -17,7 +19,8 @@ public class Donation {
 	
 	private String dateReceived;
 	
-	@OneToMany(mappedBy="donation", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="donation", cascade= CascadeType.ALL)
+	@JsonManagedReference
 	private List<Item> itemsDonated;
 
 	public Donation() {

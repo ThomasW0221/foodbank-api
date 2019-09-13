@@ -6,6 +6,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 public class Item {
 
@@ -19,6 +21,7 @@ public class Item {
 	
 	@ManyToOne
 	@JoinColumn(name="donation_id")
+	@JsonBackReference
 	private Donation donation;
 	
 	public Item() {
