@@ -10,16 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 import io.foodbankproject.foodbankapi.entity.Donation;
 import io.foodbankproject.foodbankapi.entity.Item;
 import io.foodbankproject.foodbankapi.repository.DonationRepository;
-import io.foodbankproject.foodbankapi.repository.ItemRepository;
 
 @RestController("/donations")
 public class DonationController {
 
 	@Autowired
 	private DonationRepository donationRepository;
-	
-	@Autowired
-	private ItemRepository itemRepository;
 	
 	@GetMapping("/getAll")
 	public Iterable<Donation> getAll() {
