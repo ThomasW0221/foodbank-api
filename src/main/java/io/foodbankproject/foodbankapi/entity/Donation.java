@@ -2,26 +2,37 @@ package io.foodbankproject.foodbankapi.entity;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 public class Donation {
 
-	@Id
-	@Column
-	private Integer donationId;
+	private @Id @GeneratedValue(strategy=GenerationType.IDENTITY) Integer donationId;
 	
-	@Column
 	private String dateReceived;
+	
+	@OneToMany(mappedBy="donation", cascade= CascadeType.ALL)
+	@JsonManagedReference
+	private List<Item> itemsDonated;
 
 	public Donation() {
 		// empty constructor
 	}
 	
-	public Donation(Integer donationId, String dateReceived) {
-		this.donationId = donationId;
+	public Donation(String dateReceived, List<Item> itemsDonated) {
+		this.dateReceived = dateReceived;
+		this.itemsDonated = itemsDonated;
+	}
+
+	public Donation(String dateReceived) {
 		this.dateReceived = dateReceived;
 	}
 
@@ -41,8 +52,20 @@ public class Donation {
 		this.dateReceived = dateReceived;
 	}
 	
-//	@Column
-// 	One to Many mapping
-//	private List<Item> items;
+	public List<Item> getItemsDonated() {
+		return itemsDonated;
+	}
+
+	public void setItemsDonated(List<Item> itemsDonated) {
+		this.itemsDonated = itemsDonated;
+	}
+
+	@Override
+	public String toString() {
+		return "Donation [donationId=" + donationId + ", dateReceived=" + dateReceived + ", itemsDonated="
+				+ itemsDonated + "]";
+	}
+	
+	
 	
 }
