@@ -24,7 +24,7 @@ public class LoadDatabase {
 			List<Item> d1Items = new ArrayList<>();
 			d1Items.add(item1d1);
 			d1Items.add(item2d1);
-			Donation d1 = new Donation("9/12/2019", d1Items);
+			Donation d1 = new Donation("9/12/2019", d1Items, "Chris", "12Fake@email.com", "1234 Barber Rd", 10);
 			for(Item item : d1.getItemsDonated()){
 				item.setDonation(d1);
 			}
@@ -38,7 +38,7 @@ public class LoadDatabase {
 			d2Items.add(item1d2);
 			d2Items.add(item2d2);
 			d2Items.add(item3d2);
-			Donation d2 = new Donation("9/13/2019", d2Items);
+			Donation d2 = new Donation("9/13/2019", d2Items, "Ramsey", "13fake@email.com", "12 Hacker Loop", 15);
 			for(Item item : d2.getItemsDonated()){
 				item.setDonation(d2);
 			}

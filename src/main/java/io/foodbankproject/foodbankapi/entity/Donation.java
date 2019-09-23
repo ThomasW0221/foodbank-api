@@ -23,13 +23,21 @@ public class Donation {
 	@JsonManagedReference
 	private List<Item> itemsDonated;
 
+	private String donorName, donorEmail, donorAddress;
+	private int donorWeight;
+
 	public Donation() {
 		// empty constructor
 	}
 	
-	public Donation(String dateReceived, List<Item> itemsDonated) {
+	public Donation(String dateReceived, List<Item> itemsDonated, String donorName, String donorEmail, String donorAddress, int donorWeight) {
 		this.dateReceived = dateReceived;
 		this.itemsDonated = itemsDonated;
+		this.donorName = donorName;
+		this.donorEmail = donorEmail;
+		this.donorAddress = donorAddress;
+		this.donorWeight = donorWeight;
+
 	}
 
 	public Donation(String dateReceived) {
@@ -58,6 +66,38 @@ public class Donation {
 
 	public void setItemsDonated(List<Item> itemsDonated) {
 		this.itemsDonated = itemsDonated;
+	}
+
+	public String getDonorName() {
+		return donorName;
+	}
+
+	public void setDonorName(String donorName) {
+		this.donorName = donorName;
+	}
+
+	public String getDonorEmail() {
+		return donorEmail;
+	}
+
+	public void setDonorEmail(String donorEmail) {
+		this.donorEmail = donorEmail;
+	}
+
+	public String getDonorAddress() {
+		return donorAddress;
+	}
+
+	public void setDonorAddress(String donorAddress) {
+		this.donorAddress = donorAddress;
+	}
+
+	public int getDonorWeight() {
+		return donorWeight;
+	}
+
+	public void setDonorWeight(int donorWeight) {
+		this.donorWeight = donorWeight;
 	}
 
 	@Override
