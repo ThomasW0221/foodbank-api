@@ -19,8 +19,8 @@ public class LoadDatabase {
 	CommandLineRunner run(DonationRepository donationRepository) {
 		return args -> {
 			// Load Donation 1
-			Item item1d1 = new Item("Can of beans", "kidney beans", false);
-			Item item2d1 = new Item("Bananas", "1 bundle of bananas", true);
+			Item item1d1 = new Item("Can of beans", "kidney beans", false, 2);
+			Item item2d1 = new Item("Bananas", "1 bundle of bananas", true, 2);
 			List<Item> d1Items = new ArrayList<>();
 			d1Items.add(item1d1);
 			d1Items.add(item2d1);
@@ -31,9 +31,9 @@ public class LoadDatabase {
 			donationRepository.save(d1);
 			
 			// Load Donation 2
-			Item item1d2 = new Item("skinless chicken breast", "purdue", true);
-			Item item2d2 = new Item("cheerios", "1 box", false);
-			Item item3d2 = new Item("lox", "salted smoked salmon", true);
+			Item item1d2 = new Item("skinless chicken breast", "purdue", true, 2);
+			Item item2d2 = new Item("cheerios", "1 box", false, 1);
+			Item item3d2 = new Item("lox", "salted smoked salmon", true, 2);
 			List<Item> d2Items = new ArrayList<>();
 			d2Items.add(item1d2);
 			d2Items.add(item2d2);

@@ -3,12 +3,16 @@ package io.foodbankproject.foodbankapi.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.foodbankproject.foodbankapi.entity.Donation;
 import io.foodbankproject.foodbankapi.entity.Item;
+import io.foodbankproject.foodbankapi.repository.DonationRepository;
 import io.foodbankproject.foodbankapi.repository.ItemRepository;
 
 @RestController
@@ -16,6 +20,9 @@ public class ItemController {
 	
 	@Autowired
 	private ItemRepository itemRepository;
+	
+	@Autowired
+	private DonationRepository donationRepository;
 	
 	@GetMapping("/items")
 	public List<Item> getAllItems() {

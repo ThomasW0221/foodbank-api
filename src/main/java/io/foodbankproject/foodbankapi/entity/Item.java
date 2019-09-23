@@ -16,7 +16,7 @@ public class Item {
 	private String name;
 	
 	private String description;
-	
+	private int itemCount;
 	private boolean perishable;
 	
 	@ManyToOne
@@ -28,10 +28,11 @@ public class Item {
 		
 	}
 
-	public Item(String name, String description, boolean perishable) {
+	public Item(String name, String description, boolean perishable, int itemCount) {
 		this.name = name;
 		this.description = description;
 		this.perishable = perishable;
+		this.itemCount = itemCount;
 	}
 
 	public Integer getItemId() {
@@ -73,5 +74,13 @@ public class Item {
 	public void setDonation(Donation donation) {
 		this.donation = donation;
 	}
-		
+
+	public int getItemCount() {
+		return itemCount;
+	}
+
+	public void setItemCount(int itemCount) {
+		this.itemCount = itemCount;
+	}
+	
 }
