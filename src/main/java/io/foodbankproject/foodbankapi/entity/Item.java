@@ -19,6 +19,8 @@ public class Item {
 	
 	private boolean perishable;
 	
+	private int itemCount;
+	
 	@ManyToOne
 	@JoinColumn(name="donation_id")
 	@JsonBackReference
@@ -28,10 +30,11 @@ public class Item {
 		
 	}
 
-	public Item(String name, String description, boolean perishable) {
+	public Item(String name, String description, boolean perishable, int itemCount) {
 		this.name = name;
 		this.description = description;
 		this.perishable = perishable;
+		this.itemCount = itemCount;
 	}
 
 	public Integer getItemId() {
@@ -72,6 +75,20 @@ public class Item {
 
 	public void setDonation(Donation donation) {
 		this.donation = donation;
+	}
+
+	public int getItemCount() {
+		return itemCount;
+	}
+
+	public void setItemCount(int itemCount) {
+		this.itemCount = itemCount;
+	}
+
+	@Override
+	public String toString() {
+		return "Item [itemId=" + itemId + ", name=" + name + ", description=" + description + ", perishable="
+				+ perishable + ", itemCount=" + itemCount + ", donation=" + donation + "]";
 	}
 		
 }

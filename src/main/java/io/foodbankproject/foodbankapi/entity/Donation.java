@@ -3,7 +3,6 @@ package io.foodbankproject.foodbankapi.entity;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -103,7 +102,8 @@ public class Donation {
 	@Override
 	public String toString() {
 		return "Donation [donationId=" + donationId + ", dateReceived=" + dateReceived + ", itemsDonated="
-				+ itemsDonated + "]";
+				+ itemsDonated + ", donorName=" + donorName + ", donorEmail=" + donorEmail + ", donorAddress="
+				+ donorAddress + ", donorWeight=" + donorWeight + "]";
 	}
 	
 	
