@@ -23,19 +23,19 @@ public class Donation {
 	private List<Item> itemsDonated;
 
 	private String donorName, donorEmail, donorAddress;
-	private int donorWeight;
+	private int donationWeight;
 
 	public Donation() {
 		// empty constructor
 	}
 	
-	public Donation(String dateReceived, List<Item> itemsDonated, String donorName, String donorEmail, String donorAddress, int donorWeight) {
+	public Donation(String dateReceived, List<Item> itemsDonated, String donorName, String donorEmail, String donorAddress, int donationWeight) {
 		this.dateReceived = dateReceived;
 		this.itemsDonated = itemsDonated;
 		this.donorName = donorName;
 		this.donorEmail = donorEmail;
 		this.donorAddress = donorAddress;
-		this.donorWeight = donorWeight;
+		this.donationWeight = donationWeight;
 
 	}
 
@@ -92,18 +92,18 @@ public class Donation {
 	}
 
 	public int getDonorWeight() {
-		return donorWeight;
+		return donationWeight;
 	}
 
 	public void setDonorWeight(int donorWeight) {
-		this.donorWeight = donorWeight;
+		this.donationWeight = donorWeight;
 	}
 
 	@Override
 	public String toString() {
 		return "Donation [donationId=" + donationId + ", dateReceived=" + dateReceived + ", itemsDonated="
 				+ itemsDonated + ", donorName=" + donorName + ", donorEmail=" + donorEmail + ", donorAddress="
-				+ donorAddress + ", donorWeight=" + donorWeight + "]";
+				+ donorAddress + ", donorWeight=" + donationWeight + "]";
 	}
 	
 	
