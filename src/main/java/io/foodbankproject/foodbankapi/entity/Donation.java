@@ -91,19 +91,19 @@ public class Donation {
 		this.donorAddress = donorAddress;
 	}
 
-	public int getDonorWeight() {
+	public int getDonationWeight() {
 		return donationWeight;
 	}
 
-	public void setDonorWeight(int donorWeight) {
-		this.donationWeight = donorWeight;
+	public void setDonationWeight(int donationWeight) {
+		this.donationWeight = donationWeight;
 	}
 
 	@Override
 	public String toString() {
 		return "Donation [donationId=" + donationId + ", dateReceived=" + dateReceived + ", itemsDonated="
 				+ itemsDonated + ", donorName=" + donorName + ", donorEmail=" + donorEmail + ", donorAddress="
-				+ donorAddress + ", donorWeight=" + donationWeight + "]";
+				+ donorAddress + ", donationWeight=" + donationWeight + "]";
 	}
 	
 	
