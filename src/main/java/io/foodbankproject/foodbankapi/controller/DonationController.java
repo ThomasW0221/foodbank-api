@@ -46,6 +46,9 @@ public class DonationController {
 			} else {
 				return ResponseEntity.notFound().build();
 			}
+			
+		} else if (donorName != null && fromDate != null) {
+			
 		} else if (fromDate != null) {
 			if (toDate != null) {
 				return ResponseEntity.ok(donationRepository.findByFromAndToDate(fromDate, toDate));
