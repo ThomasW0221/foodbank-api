@@ -1,12 +1,10 @@
 package io.foodbankproject.foodbankapi.controller;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +25,16 @@ public class DonationController {
 	@Autowired
 	private InventoryItemRepository inventoryItemRepository;
 
+	/**
+	 * 
+	 * @param donationId donation id accepted from request
+	 * @param fromDate date string accepted from request
+	 * @param toDate date string accepted from request
+	 * @param donorName donor string accepted from request
+	 * @param minWeight minimum weight for weight query
+	 * @param maxWeight maximum weight for weight query
+	 * @return Response entity describing results of desired query, or all donations
+	 */
 	@GetMapping("/donations")
 	public ResponseEntity<?> getDonations(@RequestParam(name = "donationId", required = false) Integer donationId,
 			@RequestParam(name = "fromDate", required = false) String fromDate,
