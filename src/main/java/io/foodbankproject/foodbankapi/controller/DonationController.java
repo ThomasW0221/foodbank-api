@@ -3,10 +3,11 @@ package io.foodbankproject.foodbankapi.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.foodbankproject.foodbankapi.entity.Donation;
@@ -20,56 +21,83 @@ public class DonationController {
 
 	@Autowired
 	private DonationRepository donationRepository;
-	
+
 	@Autowired
 	private InventoryItemRepository inventoryItemRepository;
-	
+
 	/**
-	 * Returns the list of all donations when an HTTP GET request is made to the /donations endpoint
 	 * 
-	 * @return The list of donation objects
+	 * @param donationId donation id accepted from request
+	 * @param fromDate date string accepted from request
+	 * @param toDate date string accepted from request
+	 * @param donorName donor string accepted from request
+	 * @param minWeight minimum weight for weight query
+	 * @param maxWeight maximum weight for weight query
+	 * @return Response entity describing results of desired query, or all donations
 	 */
 	@GetMapping("/donations")
-	public List<Donation> getAllDonations() {
-		return donationRepository.findAll();
+	public ResponseEntity<?> getDonations(@RequestParam(name = "donationId", required = false) Integer donationId,
+			@RequestParam(name = "fromDate", required = false) String fromDate,
+			@RequestParam(name = "toDate", required = false) String toDate,
+			@RequestParam(name = "donorName", required = false) String donorName,
+			@RequestParam(name = "minWeight", required = false) Integer minWeight,
+			@RequestParam(name = "maxWeight", required = false) Integer maxWeight) {
+
+		return getDonationsHelper(donationId, fromDate, toDate, donorName, minWeight, maxWeight);
+
 	}
-	
-	/**
-	 * <p>Returns the single donation object based on ID, when an HTTP GET request is made to the /donations endpoint.
-	 * This method will be refactored in the near future.</p>
-	 * 
-	 * @param id id of entity
-	 * @return
-	 */
-	@GetMapping("donations/{id}")
-	public Donation getOneDonation(@PathVariable("id") Integer id) {
-		//TODO: Validate that we have an item present at that id
-		//Hint, look at methods available on donationRepository
-		
-		return donationRepository.findById(id).orElse(null);
+
+	private ResponseEntity<?> getDonationsHelper(Integer donationId, String fromDate, String toDate, String donorName,
+			Integer minWeight, Integer maxWeight) {
+		if (donationId != null) { // donation id passed in
+			if (donationRepository.existsById(donationId)) {
+				return ResponseEntity.ok(donationRepository.findById(donationId).orElse(null));
+			} else {
+				return ResponseEntity.notFound().build();
+			}
+		} else if (donorName != null && fromDate != null) { // donor name and from date passed in
+			if (toDate != null) { // donor name with to date and from date
+				return ResponseEntity.ok(donationRepository.findByNameFromDateAndToDate(donorName, fromDate, toDate));
+			}
+			return ResponseEntity.ok(donationRepository.findByNameAndFromDate(donorName, fromDate));
+		} else if (donorName != null) { // just donor name passed in
+			return ResponseEntity.ok(donationRepository.findByName(donorName));
+		} else if (fromDate != null) { // from date passed in
+			if (toDate != null) { // from date and to date passed in
+				return ResponseEntity.ok(donationRepository.findByFromAndToDate(fromDate, toDate));
+			} else {
+				return ResponseEntity.ok(donationRepository.findByFromDate(fromDate));
+			}
+		} else if (minWeight != null && maxWeight != null) { // min and max weight passed in
+			return ResponseEntity.ok(donationRepository.findByWeightRange(minWeight, maxWeight));
+		} else {
+			return ResponseEntity.ok(donationRepository.findAll());
+		}
 	}
-	
+
 	/**
-	 * <p>Accepts a Donation object to be submitted through and HTTP POST request and adds it to
-	 * the table of donation entity objects. Also adds the items to the item entity table.
-	 * Lastly, it updates the InventoryItem table with new counts</p>
+	 * <p>
+	 * Accepts a Donation object to be submitted through and HTTP POST request and
+	 * adds it to the table of donation entity objects. Also adds the items to the
+	 * item entity table. Lastly, it updates the InventoryItem table with new counts
+	 * </p>
 	 * 
 	 * @param donation donation object that is submitted through HTTP POST
 	 */
 	@PostMapping("/donations")
 	public void addDonation(@RequestBody Donation donation) {
-		for(Item item : donation.getItemsDonated()){
+		for (Item item : donation.getItemsDonated()) {
 			item.setDonation(donation);
 		}
 		donationRepository.save(donation);
-		
+
 		addToInventory(donation.getItemsDonated());
 	}
-	
+
 	private void addToInventory(List<Item> itemList) {
-		for(Item item: itemList) {
+		for (Item item : itemList) {
 			String itemName = item.getName();
-			if(inventoryItemRepository.existsById(itemName)) {
+			if (inventoryItemRepository.existsById(itemName)) {
 				InventoryItem inventoryItem = inventoryItemRepository.findById(itemName).orElse(null);
 				int inventoryItemCurrentQuantity = inventoryItem.getFoodItemQuantity();
 				inventoryItem.setFoodItemQuantity(inventoryItemCurrentQuantity + item.getItemCount());
@@ -80,5 +108,5 @@ public class DonationController {
 			}
 		}
 	}
-	
+
 }
