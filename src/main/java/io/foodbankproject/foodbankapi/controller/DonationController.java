@@ -27,34 +27,36 @@ public class DonationController {
 	@Autowired
 	private InventoryItemRepository inventoryItemRepository;
 	
-	/**
-	 * Returns the list of all donations when an HTTP GET request is made to the /donations endpoint
-	 * 
-	 * @return The list of donation objects
-	 */
+	
 	@GetMapping("/donations")
-	public ResponseEntity<?> getAllDonations(@RequestParam(name="itemId", required=false) Integer itemId,
+	public ResponseEntity<?> getAllDonations(@RequestParam(name="donationId", required=false) Integer donationId,
 			@RequestParam(name="fromDate", required=false) String fromDate,
 			@RequestParam(name="toDate", required=false) String toDate,
 			@RequestParam(name="donorName", required=false) String donorName,
 			@RequestParam(name="minWeight", required=false) Integer minWeight,
 			@RequestParam(name="maxWeight", required=false) Integer maxWeight) {
 		
-		if (itemId != null) {
-			if(donationRepository.existsById(itemId)) {
-				return ResponseEntity.ok(donationRepository.findById(itemId).orElse(null));
+		if (donationId != null) {
+			if(donationRepository.existsById(donationId)) {
+				return ResponseEntity.ok(donationRepository.findById(donationId).orElse(null));
 			} else {
 				return ResponseEntity.notFound().build();
-			}
-			
+			}	
 		} else if (donorName != null && fromDate != null) {
-			
+			if (toDate != null) {
+				return ResponseEntity.ok(donationRepository.findByNameFromDateAndToDate(donorName, fromDate, toDate));
+			}
+			return ResponseEntity.ok(donationRepository.findByNameAndFromDate(donorName, fromDate));
+		} else if (donorName != null) {
+			return ResponseEntity.ok(donationRepository.findByName(donorName));
 		} else if (fromDate != null) {
 			if (toDate != null) {
 				return ResponseEntity.ok(donationRepository.findByFromAndToDate(fromDate, toDate));
 			} else {
 				return ResponseEntity.ok(donationRepository.findByFromDate(fromDate));
 			}
+		} else if (minWeight != null && maxWeight != null) {
+			return ResponseEntity.ok(donationRepository.findByWeightRange(minWeight, maxWeight));
 		}
 		
 		return ResponseEntity.ok("fall through");
