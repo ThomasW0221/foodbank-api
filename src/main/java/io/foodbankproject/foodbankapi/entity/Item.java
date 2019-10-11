@@ -17,8 +17,6 @@ public class Item {
 	
 	private String description;
 	
-	private boolean perishable;
-	
 	private int itemCount;
 	
 	@ManyToOne
@@ -30,10 +28,9 @@ public class Item {
 		
 	}
 
-	public Item(String name, String description, boolean perishable, int itemCount) {
+	public Item(String name, String description, int itemCount) {
 		this.name = name;
 		this.description = description;
-		this.perishable = perishable;
 		this.itemCount = itemCount;
 	}
 
@@ -61,14 +58,6 @@ public class Item {
 		this.description = description;
 	}
 
-	public boolean isPerishable() {
-		return perishable;
-	}
-
-	public void setPerishable(boolean perishable) {
-		this.perishable = perishable;
-	}
-
 	public Donation getDonation() {
 		return donation;
 	}
@@ -87,8 +76,8 @@ public class Item {
 
 	@Override
 	public String toString() {
-		return "Item [itemId=" + itemId + ", name=" + name + ", description=" + description + ", perishable="
-				+ perishable + ", itemCount=" + itemCount + ", donation=" + donation + "]";
+		return "Item [itemId=" + itemId + ", name=" + name + ", description=" + description + ", itemCount=" + itemCount
+				+ ", donation=" + donation + "]";
 	}
 		
 }
