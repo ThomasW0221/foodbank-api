@@ -15,6 +15,7 @@ import io.foodbankproject.foodbankapi.entity.InventoryItem;
 import io.foodbankproject.foodbankapi.entity.Item;
 import io.foodbankproject.foodbankapi.repository.DonationRepository;
 import io.foodbankproject.foodbankapi.repository.InventoryItemRepository;
+import io.foodbankproject.foodbankapi.service.FullDonationService;
 
 @RestController
 public class DonationController {
@@ -24,6 +25,9 @@ public class DonationController {
 
 	@Autowired
 	private InventoryItemRepository inventoryItemRepository;
+	
+	@Autowired
+	private FullDonationService fullDonationService;
 
 	/**
 	 * 
@@ -50,16 +54,16 @@ public class DonationController {
 	private ResponseEntity<?> getDonationsHelper(Integer donationId, String fromDate, String toDate, String donorName,
 			Integer minWeight, Integer maxWeight) {
 		if (donationId != null) { // donation id passed in
-			if (donationRepository.existsById(donationId)) {
-				return ResponseEntity.ok(donationRepository.findById(donationId).orElse(null));
+			if (fullDonationService.donationExistsById(donationId)) {
+				return ResponseEntity.ok(fullDonationService.donationFindById(donationId));
 			} else {
 				return ResponseEntity.notFound().build();
 			}
 		} else if (donorName != null && fromDate != null) { // donor name and from date passed in
 			if (toDate != null) { // donor name with to date and from date
-				return ResponseEntity.ok(donationRepository.findByNameFromDateAndToDate(donorName, fromDate, toDate));
+				return ResponseEntity.ok(fullDonationService.donationFindByNameFromDateAndToDate(donorName, fromDate, toDate));
 			}
-			return ResponseEntity.ok(donationRepository.findByNameAndFromDate(donorName, fromDate));
+			return ResponseEntity.ok(fullDonationService.donationFindByNameAndFromDate(donorName, fromDate));
 		} else if (donorName != null) { // just donor name passed in
 			return ResponseEntity.ok(donationRepository.findByName(donorName));
 		} else if (fromDate != null) { // from date passed in
