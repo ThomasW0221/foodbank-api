@@ -4,17 +4,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.foodbankproject.foodbankapi.entity.Donation;
 import io.foodbankproject.foodbankapi.entity.InventoryItem;
+import io.foodbankproject.foodbankapi.entity.InventoryItemWrapper;
 import io.foodbankproject.foodbankapi.entity.Item;
-import io.foodbankproject.foodbankapi.repository.InventoryItemRepository;
 import io.foodbankproject.foodbankapi.service.FullDonationService;
 
 @RestController
@@ -94,7 +96,7 @@ public class DonationController {
 		addToInventory(donation.getItemsDonated());
 	}
 
-	private void addToInventory(List<Item> itemList) {
+	private synchronized void addToInventory(List<Item> itemList) {
 		for (Item item : itemList) {
 			String itemName = item.getName();
 			if (fullDonationService.inventoryItemExistsById(itemName)) {
@@ -106,6 +108,74 @@ public class DonationController {
 				InventoryItem inventoryItem = new InventoryItem(item.getName(), item.getItemCount());
 				fullDonationService.saveInventoryItem(inventoryItem);
 			}
+		}
+	}
+	
+	// Inventory Endpoints
+	
+	@GetMapping("/inventory")
+	public ResponseEntity<?> getInventoryItems(@RequestParam(name="itemName", required=false, defaultValue="null")
+		String itemName){
+		
+		if(itemName.equals("null")) {
+			return ResponseEntity.ok(fullDonationService.inventoryItemFindAll());
+		} else {
+			if(fullDonationService.inventoryItemExistsById(itemName)) {
+				return ResponseEntity.ok(fullDonationService.inventoryItemFindById(itemName));
+			} else {
+				return ResponseEntity.notFound().build();
+			}
+		}
+	}
+	
+	@PutMapping("/inventory")
+	public ResponseEntity<?> updateInventoryItemCounts(@RequestBody InventoryItemWrapper itemList){
+		return removeFromInventory(itemList);
+	}
+	
+	private synchronized ResponseEntity<?> removeFromInventory(InventoryItemWrapper itemList) {
+		for(InventoryItem item : itemList.getInventoryItemList()) {
+			if(fullDonationService.inventoryItemExistsById(item.getFoodItemName())) {
+				InventoryItem itemToModify = fullDonationService.inventoryItemFindById(item.getFoodItemName());
+				int newQuantity = itemToModify.getFoodItemQuantity() - item.getFoodItemQuantity();
+				if(newQuantity == 0) {
+					fullDonationService.deleteInventoryItem(itemToModify);
+					continue;
+				}
+				itemToModify.setFoodItemQuantity(newQuantity);
+				fullDonationService.saveInventoryItem(itemToModify);
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(item.getFoodItemName() + 
+						" was not found in the database. Please correct the request, resubmit the item"
+						+ " that caused an error, and all the items after that.");
+			}
+		}
+		return ResponseEntity.ok("Counts were updated successfully");
+	}
+	
+	// Item Endpoints
+	
+	@GetMapping("/items")
+	public ResponseEntity<?> getItems(@RequestParam(name="itemId", required=false) Integer itemId,
+			@RequestParam(name="donationId", required=false) Integer donationId,
+			@RequestParam(name="itemName", required=false) String itemName) {
+		
+		return getItemsHelper(itemId, donationId, itemName);
+	}
+	
+	private ResponseEntity<?> getItemsHelper(Integer itemId, Integer donationId, String itemName) {
+		if (itemId != null) {
+			if(fullDonationService.itemExistsById(itemId)) {
+				return ResponseEntity.ok(fullDonationService.itemFindById(itemId));
+			} else {
+				return ResponseEntity.notFound().build();
+			}
+		} else if (donationId != null) {
+			return ResponseEntity.ok(fullDonationService.itemFindByDonationId(donationId));
+		} else if (itemName != null) {
+			return ResponseEntity.ok(fullDonationService.itemFindByName(itemName));
+		} else {
+			return ResponseEntity.badRequest().body("Please use one of the defined queries");
 		}
 	}
 

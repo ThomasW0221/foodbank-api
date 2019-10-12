@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import io.foodbankproject.foodbankapi.entity.Donation;
 import io.foodbankproject.foodbankapi.entity.InventoryItem;
+import io.foodbankproject.foodbankapi.entity.Item;
 import io.foodbankproject.foodbankapi.repository.DonationRepository;
 import io.foodbankproject.foodbankapi.repository.InventoryItemRepository;
 import io.foodbankproject.foodbankapi.repository.ItemRepository;
@@ -34,6 +35,7 @@ public class FullDonationService {
 	}
 	
 	// All Repository Check Methods
+	@Transactional(readOnly=true)
 	public boolean donationExistsById(Integer id) {
 		readWriteLock.readLock().lock();
 		boolean b;
@@ -45,11 +47,24 @@ public class FullDonationService {
 		return b;
 	}
 	
+	@Transactional(readOnly=true)
 	public boolean inventoryItemExistsById(String itemName) {
 		readWriteLock.readLock().lock();
 		boolean b;
 		try {
 			b = inventoryItemRepository.existsById(itemName);
+		} finally {
+			readWriteLock.readLock().unlock();
+		}
+		return b;
+	}
+	
+	@Transactional(readOnly=true)
+	public boolean itemExistsById(Integer id) {
+		readWriteLock.readLock().lock();
+		boolean b;
+		try {
+			b = itemRepository.existsById(id);
 		} finally {
 			readWriteLock.readLock().unlock();
 		}
@@ -198,6 +213,43 @@ public class FullDonationService {
 		} finally {
 			readWriteLock.writeLock().unlock();
 		}
+	}
+	
+	// Inventory Read Methods
+	@Transactional(readOnly=true)
+	public Item itemFindById(Integer id) {
+		readWriteLock.readLock().lock();
+		Item i;
+		try {
+			i = itemRepository.findById(id).orElse(null);
+		} finally {
+			readWriteLock.readLock().unlock();
+		}
+		return i;
+	}
+	
+	@Transactional(readOnly=true)
+	public List<Item> itemFindByDonationId(Integer donationId) {
+		readWriteLock.readLock().lock();
+		List<Item> i;
+		try {
+			i = itemRepository.findByDonation(donationId);
+		} finally {
+			readWriteLock.readLock().unlock();
+		}
+		return i;
+	}
+	
+	@Transactional(readOnly=true)
+	public List<Item> itemFindByName(String itemName) {
+		readWriteLock.readLock().lock();
+		List<Item> i;
+		try {
+			i = itemRepository.findByName(itemName);
+		} finally {
+			readWriteLock.readLock().unlock();
+		}
+		return i;
 	}
 	
 }

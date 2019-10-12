@@ -14,4 +14,7 @@ public interface ItemRepository extends JpaRepository<Item, Integer>{
 
 	@Query(value="SELECT * FROM ITEM WHERE DONATION_ID = :donationId", nativeQuery=true)
 	List<Item> findByDonation(Integer donationId);
+	
+	@Query(value="SELECT * FROM ITEM WHERE NAME = :itemName", nativeQuery=true)
+	List<Item> findByName(String itemName);
 }

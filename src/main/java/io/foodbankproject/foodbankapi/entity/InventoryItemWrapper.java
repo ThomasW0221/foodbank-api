@@ -12,11 +12,11 @@ public class InventoryItemWrapper {
 		this.inventoryItemList = inventoryItemList;
 	}
 
-	public List<InventoryItem> getInventoryItemList() {
+	public synchronized List<InventoryItem> getInventoryItemList() {
 		return inventoryItemList;
 	}
 
-	public void setInventoryItemList(List<InventoryItem> inventoryItemList) {
+	public synchronized void setInventoryItemList(List<InventoryItem> inventoryItemList) {
 		this.inventoryItemList = inventoryItemList;
 	}
 }

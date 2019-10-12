@@ -34,43 +34,43 @@ public class Item {
 		this.itemCount = itemCount;
 	}
 
-	public Integer getItemId() {
+	public synchronized Integer getItemId() {
 		return itemId;
 	}
 
-	public void setItemId(Integer itemId) {
+	public synchronized void setItemId(Integer itemId) {
 		this.itemId = itemId;
 	}
 
-	public String getName() {
+	public synchronized String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public synchronized void setName(String name) {
 		this.name = name;
 	}
 
-	public String getDescription() {
+	public synchronized String getDescription() {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public synchronized void setDescription(String description) {
 		this.description = description;
 	}
 
-	public Donation getDonation() {
+	public synchronized Donation getDonation() {
 		return donation;
 	}
 
-	public void setDonation(Donation donation) {
+	public synchronized void setDonation(Donation donation) {
 		this.donation = donation;
 	}
 
-	public int getItemCount() {
+	public synchronized int getItemCount() {
 		return itemCount;
 	}
 
-	public void setItemCount(int itemCount) {
+	public synchronized void setItemCount(int itemCount) {
 		this.itemCount = itemCount;
 	}
 

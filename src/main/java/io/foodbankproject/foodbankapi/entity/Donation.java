@@ -39,63 +39,59 @@ public class Donation {
 
 	}
 
-	public Donation(String dateReceived) {
-		this.dateReceived = dateReceived;
-	}
-
-	public Integer getDonationId() {
+	public synchronized Integer getDonationId() {
 		return donationId;
 	}
 
-	public void setDonationId(Integer donationId) {
+	public synchronized void setDonationId(Integer donationId) {
 		this.donationId = donationId;
 	}
 
-	public String getDateReceived() {
+	public synchronized String getDateReceived() {
 		return dateReceived;
 	}
 
-	public void setDateReceived(String dateReceived) {
+	public synchronized void setDateReceived(String dateReceived) {
 		this.dateReceived = dateReceived;
 	}
 	
-	public List<Item> getItemsDonated() {
+	public synchronized List<Item> getItemsDonated() {
 		return itemsDonated;
 	}
 
-	public void setItemsDonated(List<Item> itemsDonated) {
+	public synchronized void setItemsDonated(List<Item> itemsDonated) {
 		this.itemsDonated = itemsDonated;
 	}
 
-	public String getDonorName() {
+	public synchronized String getDonorName() {
 		return donorName;
 	}
 
-	public void setDonorName(String donorName) {
+	public synchronized void setDonorName(String donorName) {
 		this.donorName = donorName;
 	}
 
-	public String getDonorEmail() {
+	public synchronized String getDonorEmail() {
 		return donorEmail;
 	}
 
-	public void setDonorEmail(String donorEmail) {
+	public synchronized void setDonorEmail(String donorEmail) {
 		this.donorEmail = donorEmail;
 	}
 
-	public String getDonorAddress() {
+	public synchronized String getDonorAddress() {
 		return donorAddress;
 	}
 
-	public void setDonorAddress(String donorAddress) {
+	public synchronized void setDonorAddress(String donorAddress) {
 		this.donorAddress = donorAddress;
 	}
 
-	public int getDonationWeight() {
+	public synchronized int getDonationWeight() {
 		return donationWeight;
 	}
 
-	public void setDonationWeight(int donationWeight) {
+	public synchronized void setDonationWeight(int donationWeight) {
 		this.donationWeight = donationWeight;
 	}
 
