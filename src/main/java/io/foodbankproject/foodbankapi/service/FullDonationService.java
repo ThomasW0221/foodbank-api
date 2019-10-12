@@ -35,11 +35,25 @@ public class FullDonationService {
 	
 	// All Repository Check Methods
 	public boolean donationExistsById(Integer id) {
-		return donationRepository.existsById(id);
+		readWriteLock.readLock().lock();
+		boolean b;
+		try {
+			b = donationRepository.existsById(id);
+		} finally {
+			readWriteLock.readLock().unlock();
+		}
+		return b;
 	}
 	
 	public boolean inventoryItemExistsById(String itemName) {
-		return inventoryItemRepository.existsById(itemName);
+		readWriteLock.readLock().lock();
+		boolean b;
+		try {
+			b = inventoryItemRepository.existsById(itemName);
+		} finally {
+			readWriteLock.readLock().unlock();
+		}
+		return b;
 	}
 	
 	// Donation Read Methods
@@ -159,7 +173,7 @@ public class FullDonationService {
 		try {
 			ii = inventoryItemRepository.findAll();
 		} finally {
-			readWriteLock.readLock().lock();
+			readWriteLock.readLock().unlock();
 		}
 		
 		return ii;
