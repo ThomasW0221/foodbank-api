@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.foodbankproject.foodbankapi.entity.InventoryItem;
 import io.foodbankproject.foodbankapi.entity.InventoryItemWrapper;
-import io.foodbankproject.foodbankapi.repository.InventoryItemRepository;
 import io.foodbankproject.foodbankapi.service.FullDonationService;
 
 @RestController
