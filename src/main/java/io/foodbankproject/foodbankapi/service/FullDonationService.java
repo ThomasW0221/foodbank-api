@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.foodbankproject.foodbankapi.entity.Donation;
+import io.foodbankproject.foodbankapi.entity.InventoryItem;
 import io.foodbankproject.foodbankapi.repository.DonationRepository;
 import io.foodbankproject.foodbankapi.repository.InventoryItemRepository;
 import io.foodbankproject.foodbankapi.repository.ItemRepository;
@@ -32,11 +33,16 @@ public class FullDonationService {
 		this.readWriteLock = new ReentrantReadWriteLock();
 	}
 	
-	// Donation Get Methods
+	// All Repository Check Methods
 	public boolean donationExistsById(Integer id) {
 		return donationRepository.existsById(id);
 	}
 	
+	public boolean inventoryItemExistsById(String itemName) {
+		return inventoryItemRepository.existsById(itemName);
+	}
+	
+	// Donation Read Methods
 	@Transactional(readOnly=true)
 	public Donation donationFindById(Integer donationId) {
 		readWriteLock.readLock().lock();
@@ -74,5 +80,110 @@ public class FullDonationService {
 		return d;
 	}
 	
+	@Transactional(readOnly=true)
+	public List<Donation> donationFindByName(String name) {
+		readWriteLock.readLock().lock();
+		List<Donation> d;
+		try {
+			d = donationRepository.findByName(name);
+		} finally {
+			readWriteLock.readLock().unlock();
+		}
+		return d;
+	}
+	
+	@Transactional(readOnly=true)
+	public List<Donation> donationFindByFromAndToDate(String fromDate, String toDate) {
+		readWriteLock.readLock().lock();
+		List<Donation> d;
+		try {
+			d = donationRepository.findByFromAndToDate(fromDate, toDate);
+		} finally {
+			readWriteLock.readLock().unlock();
+		}
+		return d;
+	}
+	
+	@Transactional(readOnly=true)
+	public List<Donation> donationFindByFromDate(String fromDate) {
+		readWriteLock.readLock().lock();
+		List<Donation> d;
+		try {
+			d = donationRepository.findByFromDate(fromDate);
+		} finally {
+			readWriteLock.readLock().unlock();
+		}
+		return d;
+	}
+	
+	@Transactional(readOnly=true)
+	public List<Donation> donationFindByWeightRange(Integer minWeight, Integer maxWeight) {
+		readWriteLock.readLock().lock();
+		List<Donation> d;
+		try {
+			d = donationRepository.findByWeightRange(minWeight, maxWeight);
+		} finally {
+			readWriteLock.readLock().unlock();
+		}
+		return d;
+	}
+	
+	// Donation Write Methods
+	@Transactional
+	public void saveDonation(Donation donation) {
+		readWriteLock.writeLock().lock();
+		try {
+			donationRepository.save(donation);
+		} finally {
+			readWriteLock.writeLock().unlock();
+		}
+	}
+	
+	// Inventory Item Read Methods
+	@Transactional(readOnly=true)
+	public InventoryItem inventoryItemFindById(String itemName) {
+		readWriteLock.readLock().lock();
+		InventoryItem ii;
+		try {
+			ii = inventoryItemRepository.findById(itemName).orElse(null);
+		} finally {
+			readWriteLock.readLock().unlock();
+		}
+		return ii;
+	}
+	
+	@Transactional(readOnly=true)
+	public List<InventoryItem> inventoryItemFindAll() {
+		readWriteLock.readLock().lock();
+		List<InventoryItem> ii;
+		try {
+			ii = inventoryItemRepository.findAll();
+		} finally {
+			readWriteLock.readLock().lock();
+		}
+		
+		return ii;
+	}
+	
+	// Inventory Item Write Methods
+	@Transactional
+	public void saveInventoryItem(InventoryItem ii) {
+		readWriteLock.writeLock().lock();
+		try {
+			inventoryItemRepository.save(ii);
+		} finally {
+			readWriteLock.writeLock().unlock();
+		}
+	}
+	
+	@Transactional
+	public void deleteInventoryItem(InventoryItem ii) {
+		readWriteLock.writeLock().lock();
+		try {
+			inventoryItemRepository.delete(ii);
+		} finally {
+			readWriteLock.writeLock().unlock();
+		}
+	}
 	
 }

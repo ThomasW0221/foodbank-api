@@ -1,5 +1,6 @@
 package io.foodbankproject.foodbankapi.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,19 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 import io.foodbankproject.foodbankapi.entity.Donation;
 import io.foodbankproject.foodbankapi.entity.InventoryItem;
 import io.foodbankproject.foodbankapi.entity.Item;
-import io.foodbankproject.foodbankapi.repository.DonationRepository;
 import io.foodbankproject.foodbankapi.repository.InventoryItemRepository;
 import io.foodbankproject.foodbankapi.service.FullDonationService;
 
 @RestController
 public class DonationController {
 
-	@Autowired
-	private DonationRepository donationRepository;
-
-	@Autowired
-	private InventoryItemRepository inventoryItemRepository;
-	
 	@Autowired
 	private FullDonationService fullDonationService;
 
@@ -65,17 +59,19 @@ public class DonationController {
 			}
 			return ResponseEntity.ok(fullDonationService.donationFindByNameAndFromDate(donorName, fromDate));
 		} else if (donorName != null) { // just donor name passed in
-			return ResponseEntity.ok(donationRepository.findByName(donorName));
+			return ResponseEntity.ok(fullDonationService.donationFindByName(donorName));
 		} else if (fromDate != null) { // from date passed in
 			if (toDate != null) { // from date and to date passed in
-				return ResponseEntity.ok(donationRepository.findByFromAndToDate(fromDate, toDate));
-			} else {
-				return ResponseEntity.ok(donationRepository.findByFromDate(fromDate));
+				return ResponseEntity.ok(fullDonationService.donationFindByFromAndToDate(fromDate, toDate));
 			}
+			return ResponseEntity.ok(fullDonationService.donationFindByFromDate(fromDate));
 		} else if (minWeight != null && maxWeight != null) { // min and max weight passed in
-			return ResponseEntity.ok(donationRepository.findByWeightRange(minWeight, maxWeight));
+			return ResponseEntity.ok(fullDonationService.donationFindByWeightRange(minWeight, maxWeight));
 		} else {
-			return ResponseEntity.ok(donationRepository.findAll());
+			LocalDateTime time = LocalDateTime.now();
+			time = time.minusDays(30);
+			String timeString = String.format("%04d-%02d-%02d", time.getYear(), time.getMonthValue(), time.getDayOfMonth());
+			return ResponseEntity.ok(fullDonationService.donationFindByFromDate(timeString));
 		}
 	}
 
@@ -93,7 +89,7 @@ public class DonationController {
 		for (Item item : donation.getItemsDonated()) {
 			item.setDonation(donation);
 		}
-		donationRepository.save(donation);
+		fullDonationService.saveDonation(donation);
 
 		addToInventory(donation.getItemsDonated());
 	}
@@ -101,14 +97,14 @@ public class DonationController {
 	private void addToInventory(List<Item> itemList) {
 		for (Item item : itemList) {
 			String itemName = item.getName();
-			if (inventoryItemRepository.existsById(itemName)) {
-				InventoryItem inventoryItem = inventoryItemRepository.findById(itemName).orElse(null);
+			if (fullDonationService.inventoryItemExistsById(itemName)) {
+				InventoryItem inventoryItem = fullDonationService.inventoryItemFindById(itemName);
 				int inventoryItemCurrentQuantity = inventoryItem.getFoodItemQuantity();
 				inventoryItem.setFoodItemQuantity(inventoryItemCurrentQuantity + item.getItemCount());
-				inventoryItemRepository.save(inventoryItem);
+				fullDonationService.saveInventoryItem(inventoryItem);
 			} else {
 				InventoryItem inventoryItem = new InventoryItem(item.getName(), item.getItemCount());
-				inventoryItemRepository.save(inventoryItem);
+				fullDonationService.saveInventoryItem(inventoryItem);
 			}
 		}
 	}

@@ -12,22 +12,23 @@ import org.springframework.web.bind.annotation.RestController;
 import io.foodbankproject.foodbankapi.entity.InventoryItem;
 import io.foodbankproject.foodbankapi.entity.InventoryItemWrapper;
 import io.foodbankproject.foodbankapi.repository.InventoryItemRepository;
+import io.foodbankproject.foodbankapi.service.FullDonationService;
 
 @RestController
 public class InventoryItemController {
 	
 	@Autowired
-	private InventoryItemRepository inventoryItemRepository;
+	private FullDonationService fullDonationService;
 
 	@GetMapping("/inventory")
 	public ResponseEntity<?> getInventoryItems(@RequestParam(name="itemName", required=false, defaultValue="null")
 		String itemName){
 		
 		if(itemName.equals("null")) {
-			return ResponseEntity.ok(inventoryItemRepository.findAll());
+			return ResponseEntity.ok(fullDonationService.inventoryItemFindAll());
 		} else {
-			if(inventoryItemRepository.existsById(itemName)) {
-				return ResponseEntity.ok(inventoryItemRepository.findById(itemName));
+			if(fullDonationService.inventoryItemExistsById(itemName)) {
+				return ResponseEntity.ok(fullDonationService.inventoryItemFindById(itemName));
 			} else {
 				return ResponseEntity.notFound().build();
 			}
@@ -37,15 +38,15 @@ public class InventoryItemController {
 	@PostMapping("/inventory")
 	public ResponseEntity<?> updateInventoryItemCounts(@RequestBody InventoryItemWrapper itemList){
 		for(InventoryItem item : itemList.getInventoryItemList()) {
-			if(inventoryItemRepository.existsById(item.getFoodItemName())) {
-				InventoryItem itemToModify = inventoryItemRepository.findById(item.getFoodItemName()).orElse(null);
-				int newQuantity = itemToModify.getFoodItemQuantity()- item.getFoodItemQuantity();
+			if(fullDonationService.inventoryItemExistsById(item.getFoodItemName())) {
+				InventoryItem itemToModify = fullDonationService.inventoryItemFindById(item.getFoodItemName());
+				int newQuantity = itemToModify.getFoodItemQuantity() - item.getFoodItemQuantity();
 				if(newQuantity == 0) {
-					inventoryItemRepository.delete(itemToModify);
+					fullDonationService.deleteInventoryItem(itemToModify);
 					continue;
 				}
 				itemToModify.setFoodItemQuantity(newQuantity);
-				inventoryItemRepository.save(itemToModify);
+				fullDonationService.saveInventoryItem(itemToModify);
 			} else {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(item.getFoodItemName() + 
 						" was not found in the database. Please correct the request, resubmit the item"
