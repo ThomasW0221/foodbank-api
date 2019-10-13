@@ -2,10 +2,12 @@ package io.foodbankproject.foodbankapi.controller;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,6 +26,8 @@ public class DonationController {
 
 	@Autowired
 	private FullDonationService fullDonationService;
+	
+	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
 	/**
 	 * 
@@ -49,32 +53,38 @@ public class DonationController {
 
 	private ResponseEntity<?> getDonationsHelper(Integer donationId, String fromDate, String toDate, String donorName,
 			Integer minWeight, Integer maxWeight) {
-		if (donationId != null) { // donation id passed in
-			if (fullDonationService.donationExistsById(donationId)) {
-				return ResponseEntity.ok(fullDonationService.donationFindById(donationId));
+		lock.readLock().lock();
+		try {
+			if (donationId != null) { // donation id passed in
+				if (fullDonationService.donationExistsById(donationId)) {
+					return ResponseEntity.ok(fullDonationService.donationFindById(donationId));
+				} else {
+					return ResponseEntity.notFound().build();
+				}
+			} else if (donorName != null && fromDate != null) { // donor name and from date passed in
+				if (toDate != null) { // donor name with to date and from date
+					return ResponseEntity.ok(fullDonationService.donationFindByNameFromDateAndToDate(donorName, fromDate, toDate));
+				}
+				return ResponseEntity.ok(fullDonationService.donationFindByNameAndFromDate(donorName, fromDate));
+			} else if (donorName != null) { // just donor name passed in
+				return ResponseEntity.ok(fullDonationService.donationFindByName(donorName));
+			} else if (fromDate != null) { // from date passed in
+				if (toDate != null) { // from date and to date passed in
+					return ResponseEntity.ok(fullDonationService.donationFindByFromAndToDate(fromDate, toDate));
+				}
+				return ResponseEntity.ok(fullDonationService.donationFindByFromDate(fromDate));
+			} else if (minWeight != null && maxWeight != null) { // min and max weight passed in
+				return ResponseEntity.ok(fullDonationService.donationFindByWeightRange(minWeight, maxWeight));
 			} else {
-				return ResponseEntity.notFound().build();
+				LocalDateTime time = LocalDateTime.now();
+				time = time.minusDays(30);
+				String timeString = String.format("%04d-%02d-%02d", time.getYear(), time.getMonthValue(), time.getDayOfMonth());
+				return ResponseEntity.ok(fullDonationService.donationFindByFromDate(timeString));
 			}
-		} else if (donorName != null && fromDate != null) { // donor name and from date passed in
-			if (toDate != null) { // donor name with to date and from date
-				return ResponseEntity.ok(fullDonationService.donationFindByNameFromDateAndToDate(donorName, fromDate, toDate));
-			}
-			return ResponseEntity.ok(fullDonationService.donationFindByNameAndFromDate(donorName, fromDate));
-		} else if (donorName != null) { // just donor name passed in
-			return ResponseEntity.ok(fullDonationService.donationFindByName(donorName));
-		} else if (fromDate != null) { // from date passed in
-			if (toDate != null) { // from date and to date passed in
-				return ResponseEntity.ok(fullDonationService.donationFindByFromAndToDate(fromDate, toDate));
-			}
-			return ResponseEntity.ok(fullDonationService.donationFindByFromDate(fromDate));
-		} else if (minWeight != null && maxWeight != null) { // min and max weight passed in
-			return ResponseEntity.ok(fullDonationService.donationFindByWeightRange(minWeight, maxWeight));
-		} else {
-			LocalDateTime time = LocalDateTime.now();
-			time = time.minusDays(30);
-			String timeString = String.format("%04d-%02d-%02d", time.getYear(), time.getMonthValue(), time.getDayOfMonth());
-			return ResponseEntity.ok(fullDonationService.donationFindByFromDate(timeString));
+		} finally {
+			lock.readLock().unlock();
 		}
+		
 	}
 
 	/**
@@ -96,18 +106,23 @@ public class DonationController {
 		addToInventory(donation.getItemsDonated());
 	}
 
-	private synchronized void addToInventory(List<Item> itemList) {
-		for (Item item : itemList) {
-			String itemName = item.getName();
-			if (fullDonationService.inventoryItemExistsById(itemName)) {
-				InventoryItem inventoryItem = fullDonationService.inventoryItemFindById(itemName);
-				int inventoryItemCurrentQuantity = inventoryItem.getFoodItemQuantity();
-				inventoryItem.setFoodItemQuantity(inventoryItemCurrentQuantity + item.getItemCount());
-				fullDonationService.saveInventoryItem(inventoryItem);
-			} else {
-				InventoryItem inventoryItem = new InventoryItem(item.getName(), item.getItemCount());
-				fullDonationService.saveInventoryItem(inventoryItem);
+	private void addToInventory(List<Item> itemList) {
+		lock.writeLock().lock();
+		try {
+			for (Item item : itemList) {
+				String itemName = item.getName();
+				if (fullDonationService.inventoryItemExistsById(itemName)) {
+					InventoryItem inventoryItem = fullDonationService.inventoryItemFindById(itemName);
+					int inventoryItemCurrentQuantity = inventoryItem.getFoodItemQuantity();
+					inventoryItem.setFoodItemQuantity(inventoryItemCurrentQuantity + item.getItemCount());
+					fullDonationService.saveInventoryItem(inventoryItem);
+				} else {
+					InventoryItem inventoryItem = new InventoryItem(item.getName(), item.getItemCount());
+					fullDonationService.saveInventoryItem(inventoryItem);
+				}
 			}
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
 	
@@ -117,39 +132,55 @@ public class DonationController {
 	public ResponseEntity<?> getInventoryItems(@RequestParam(name="itemName", required=false, defaultValue="null")
 		String itemName){
 		
-		if(itemName.equals("null")) {
-			return ResponseEntity.ok(fullDonationService.inventoryItemFindAll());
-		} else {
-			if(fullDonationService.inventoryItemExistsById(itemName)) {
-				return ResponseEntity.ok(fullDonationService.inventoryItemFindById(itemName));
-			} else {
-				return ResponseEntity.notFound().build();
-			}
-		}
+		return getInventoryItemsHelper(itemName);
 	}
 	
-	@PutMapping("/inventory")
+	private ResponseEntity<?> getInventoryItemsHelper(String itemName) {
+		lock.readLock().lock();
+		try {
+			if(itemName.equals("null")) {
+				return ResponseEntity.ok(fullDonationService.inventoryItemFindAll());
+			} else {
+				if(fullDonationService.inventoryItemExistsById(itemName)) {
+					return ResponseEntity.ok(fullDonationService.inventoryItemFindById(itemName));
+				} else {
+					return ResponseEntity.notFound().build();
+				}
+			}
+		} finally {
+			lock.readLock().unlock();
+		}
+		
+	}
+	
+	@DeleteMapping("/inventory")
 	public ResponseEntity<?> updateInventoryItemCounts(@RequestBody InventoryItemWrapper itemList){
 		return removeFromInventory(itemList);
 	}
 	
-	private synchronized ResponseEntity<?> removeFromInventory(InventoryItemWrapper itemList) {
-		for(InventoryItem item : itemList.getInventoryItemList()) {
-			if(fullDonationService.inventoryItemExistsById(item.getFoodItemName())) {
-				InventoryItem itemToModify = fullDonationService.inventoryItemFindById(item.getFoodItemName());
-				int newQuantity = itemToModify.getFoodItemQuantity() - item.getFoodItemQuantity();
-				if(newQuantity == 0) {
-					fullDonationService.deleteInventoryItem(itemToModify);
-					continue;
+	private ResponseEntity<?> removeFromInventory(InventoryItemWrapper itemList) {
+		lock.writeLock().lock();
+		try {
+			for(InventoryItem item : itemList.getInventoryItemList()) {
+				if(fullDonationService.inventoryItemExistsById(item.getFoodItemName())) {
+					InventoryItem itemToModify = fullDonationService.inventoryItemFindById(item.getFoodItemName());
+					int newQuantity = itemToModify.getFoodItemQuantity() - item.getFoodItemQuantity();
+					if(newQuantity == 0) {
+						fullDonationService.deleteInventoryItem(itemToModify);
+						continue;
+					}
+					itemToModify.setFoodItemQuantity(newQuantity);
+					fullDonationService.saveInventoryItem(itemToModify);
+				} else {
+					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(item.getFoodItemName() + 
+							" was not found in the database. Please correct the request, resubmit the item"
+							+ " that caused an error, and all the items after that.");
 				}
-				itemToModify.setFoodItemQuantity(newQuantity);
-				fullDonationService.saveInventoryItem(itemToModify);
-			} else {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(item.getFoodItemName() + 
-						" was not found in the database. Please correct the request, resubmit the item"
-						+ " that caused an error, and all the items after that.");
 			}
+		} finally {
+			lock.writeLock().unlock();
 		}
+		
 		return ResponseEntity.ok("Counts were updated successfully");
 	}
 	
@@ -164,19 +195,25 @@ public class DonationController {
 	}
 	
 	private ResponseEntity<?> getItemsHelper(Integer itemId, Integer donationId, String itemName) {
-		if (itemId != null) {
-			if(fullDonationService.itemExistsById(itemId)) {
-				return ResponseEntity.ok(fullDonationService.itemFindById(itemId));
+		lock.readLock().lock();
+		try {
+			if (itemId != null) {
+				if(fullDonationService.itemExistsById(itemId)) {
+					return ResponseEntity.ok(fullDonationService.itemFindById(itemId));
+				} else {
+					return ResponseEntity.notFound().build();
+				}
+			} else if (donationId != null) {
+				return ResponseEntity.ok(fullDonationService.itemFindByDonationId(donationId));
+			} else if (itemName != null) {
+				return ResponseEntity.ok(fullDonationService.itemFindByName(itemName));
 			} else {
-				return ResponseEntity.notFound().build();
+				return ResponseEntity.badRequest().body("Please use one of the defined queries");
 			}
-		} else if (donationId != null) {
-			return ResponseEntity.ok(fullDonationService.itemFindByDonationId(donationId));
-		} else if (itemName != null) {
-			return ResponseEntity.ok(fullDonationService.itemFindByName(itemName));
-		} else {
-			return ResponseEntity.badRequest().body("Please use one of the defined queries");
+		} finally {
+			lock.readLock().unlock();
 		}
+		
 	}
 
 }

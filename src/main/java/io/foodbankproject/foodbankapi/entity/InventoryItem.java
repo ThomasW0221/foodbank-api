@@ -20,19 +20,19 @@ public class InventoryItem {
 		this.foodItemQuantity = foodItemQuantity;
 	}
 
-	public synchronized String getFoodItemName() {
+	public String getFoodItemName() {
 		return foodItemName;
 	}
 
-	public synchronized void setFoodItemName(String foodItemName) {
+	public void setFoodItemName(String foodItemName) {
 		this.foodItemName = foodItemName;
 	}
 
-	public synchronized int getFoodItemQuantity() {
+	public int getFoodItemQuantity() {
 		return foodItemQuantity;
 	}
 
-	public synchronized void setFoodItemQuantity(int foodItemQuantity) {
+	public void setFoodItemQuantity(int foodItemQuantity) {
 		this.foodItemQuantity = foodItemQuantity;
 	}
 
