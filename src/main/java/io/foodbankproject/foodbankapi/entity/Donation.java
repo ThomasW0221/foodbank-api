@@ -39,10 +39,6 @@ public class Donation {
 
 	}
 
-	public Donation(String dateReceived) {
-		this.dateReceived = dateReceived;
-	}
-
 	public Integer getDonationId() {
 		return donationId;
 	}
