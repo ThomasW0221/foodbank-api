@@ -97,11 +97,9 @@ public class Donation {
 
 	@Override
 	public String toString() {
-		return "Donation [donationId=" + donationId + ", dateReceived=" + dateReceived + ", itemsDonated="
-				+ itemsDonated + ", donorName=" + donorName + ", donorEmail=" + donorEmail + ", donorAddress="
-				+ donorAddress + ", donationWeight=" + donationWeight + "]";
+		return "Donation [donationId=" + donationId + ", dateReceived=" + dateReceived + ", donorName=" + donorName
+				+ ", donorEmail=" + donorEmail + ", donorAddress=" + donorAddress + ", donationWeight=" + donationWeight
+				+ "]";
 	}
-	
-	
 	
 }
