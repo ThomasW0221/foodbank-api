@@ -16,7 +16,14 @@ public class MailHandler {
 		sendMail("unccfoodpantry123@gmail.com", "Water bottles");
 	}
 
-	public static void sendMail(String recepient, String donation) throws Exception {
+	/**
+	 * Method for sending mail, currently sends a message to a recipient and allows you to 
+	 * declare what is being donated. 
+	 * @param recipient
+	 * @param donation
+	 * @throws Exception
+	 */
+	public static void sendMail(String recipient, String donation) throws Exception {
 
 		System.out.println("Preparing to send email...");
 
@@ -36,19 +43,27 @@ public class MailHandler {
 			}
 		});
 
-		Message message = prepareMessage(session, myEmail, recepient, donation);
+		Message message = prepareMessage(session, myEmail, recipient, donation);
 
 		Transport.send(message);
 		System.out.println("Email sent");
 	}
 
-	private static Message prepareMessage(Session session, String myEmail, String recepient, String donation) {
+	/**
+	 * Prepare the message to be sent to a recipient. 
+	 * @param session - Pass in the session.
+	 * @param myEmail - The email you're sending from.
+	 * @param recepient - The recipient's email address.
+	 * @param donation - What donation? Subject to change
+	 * @return - A message object if successfull otherwise null.
+	 */
+	private static Message prepareMessage(Session session, String myEmail, String recipient, String donation) {
 		try {
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(myEmail)); // set from email
 
 			// set the recepient of the email
-			message.setRecipient(Message.RecipientType.TO, new InternetAddress(recepient));
+			message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
 
 			// handle setting subject, body text
 			message.setSubject("Example email");
