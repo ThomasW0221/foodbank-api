@@ -179,7 +179,7 @@ public class DonationController {
 			lock.writeLock().unlock();
 		}
 		
-		return ResponseEntity.ok("Counts were updated successfully");
+		return ResponseEntity.ok().build();
 	}
 	
 	// Item Endpoints
