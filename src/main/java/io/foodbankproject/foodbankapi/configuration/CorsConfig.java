@@ -13,7 +13,8 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("http://localhost:4200", "https://foodbank.ml");
+                registry.addMapping("/**").allowedOrigins("http://localhost:4200", "https://foodbank.ml")
+                	.allowedMethods("GET","POST","PUT","DELETE");
             }
         };
     }
