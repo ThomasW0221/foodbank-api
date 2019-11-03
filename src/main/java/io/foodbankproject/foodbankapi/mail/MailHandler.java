@@ -12,18 +12,15 @@ import java.util.Properties;
 
 public class MailHandler {
 
-	public static void main(String[] args) throws Exception {
-		sendMail("unccfoodpantry123@gmail.com", "Water bottles");
-	}
-
 	/**
 	 * Method for sending mail, currently sends a message to a recipient and allows you to 
 	 * declare what is being donated. 
 	 * @param recipient
+	 * @param recipientName
 	 * @param donation
 	 * @throws Exception
 	 */
-	public static void sendMail(String recipient, String donation) throws Exception {
+	public void sendMail(String recipient, String recipientName, String donation) throws Exception {
 
 		System.out.println("Preparing to send email...");
 
@@ -43,7 +40,7 @@ public class MailHandler {
 			}
 		});
 
-		Message message = prepareMessage(session, myEmail, recipient, donation);
+		Message message = prepareMessage(session, myEmail, recipient, recipientName, donation);
 
 		Transport.send(message);
 		System.out.println("Email sent");
@@ -57,7 +54,8 @@ public class MailHandler {
 	 * @param donation - What donation? Subject to change
 	 * @return - A message object if successfull otherwise null.
 	 */
-	private static Message prepareMessage(Session session, String myEmail, String recipient, String donation) {
+	private static Message prepareMessage(Session session, String myEmail, 
+			String recipient, String recipientName, String donation) {
 		try {
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(myEmail)); // set from email
@@ -74,8 +72,8 @@ public class MailHandler {
 	/*		String html = "<h1> TESTING </h1> <br/> <h2> <b> Next test </b> </h2>";
 			message.setContent(html, "text/html"); */
 			
-			message.setText("This is just an example email. \nDon't read too much " + "into it."
-					+ "\n\nThank you for donating " + donation + "\n\nNicolas Tahan (Group 13)");
+			message.setText("Thank you " + recipientName + " for donating." + "\nWe have received"
+					+ " your donation " + donation);
 
 			return message;
 		} catch (Exception e) {

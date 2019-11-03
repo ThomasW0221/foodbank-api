@@ -19,6 +19,7 @@ import io.foodbankproject.foodbankapi.entity.Donation;
 import io.foodbankproject.foodbankapi.entity.InventoryItem;
 import io.foodbankproject.foodbankapi.entity.InventoryItemWrapper;
 import io.foodbankproject.foodbankapi.entity.Item;
+import io.foodbankproject.foodbankapi.mail.MailHandler;
 import io.foodbankproject.foodbankapi.service.FullDonationService;
 
 @RestController
@@ -28,6 +29,8 @@ public class DonationController {
 	private FullDonationService fullDonationService;
 	
 	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+	private MailHandler mail = new MailHandler();
 
 	/**
 	 * 
@@ -95,15 +98,20 @@ public class DonationController {
 	 * </p>
 	 * 
 	 * @param donation donation object that is submitted through HTTP POST
+	 * @throws Exception 
 	 */
 	@PostMapping("/donations")
-	public void addDonation(@RequestBody Donation donation) {
+	public void addDonation(@RequestBody Donation donation) throws Exception {
 		for (Item item : donation.getItemsDonated()) {
 			item.setDonation(donation);
 		}
 		fullDonationService.saveDonation(donation);
 
 		addToInventory(donation.getItemsDonated());
+		
+		if (donation.getDonorEmail() != null) {
+			mail.sendMail(donation.getDonorEmail(), donation.getDonorName(), donation.getDonorName());
+		}
 	}
 
 	private void addToInventory(List<Item> itemList) {
