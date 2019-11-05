@@ -8,9 +8,35 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import java.util.Properties;
 
 public class MailHandler {
+	
+	private Properties properties;
+	
+	private String username;
+	private String password;
+	
+	private String recipient;
+	
+	private String recipientName;
+	
+	
+	public MailHandler(String recipient, String recipientName) {
+		properties = new Properties();
+		properties.put("mail.smtp.auth", true);
+		properties.put("mail.smtp.starttls.enable", true);
+		properties.put("mail.smtp.host", "smtp.gmail.com");
+		properties.put("mail.smtp.port", "587");
+		this.recipient = recipient;
+		this.recipientName = recipientName;
+		this.username = "unccfoodpantry123@gmail.com";
+		this.password = "pantry123uncc9985";
+	}
 
 	/**
 	 * Method for sending mail, currently sends a message to a recipient and allows you to 
@@ -20,63 +46,46 @@ public class MailHandler {
 	 * @param donation
 	 * @throws Exception
 	 */
-	public void sendMail(String recipient, String recipientName, String donation) throws Exception {
+	public void sendMail() throws Exception {
 
 		System.out.println("Preparing to send email...");
 
-		Properties properties = new Properties();
+		Session session = createAuthenticationSession();
+		System.out.println(username);
+		System.out.println(recipient);
+		System.out.println(recipientName);
+		Message message = prepareMessage(session, username, recipient, recipientName);
 
-		properties.put("mail.smtp.auth", true);
-		properties.put("mail.smtp.starttls.enable", true);
-		properties.put("mail.smtp.host", "smtp.gmail.com");
-		properties.put("mail.smtp.port", "587");
-
-		String myEmail = "unccfoodpantry123@gmail.com", myPassword = "pantry123uncc9985";
-
-		Session session = Session.getInstance(properties, new Authenticator() {
-			@Override
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(myEmail, myPassword);
-			}
-		});
-
-		Message message = prepareMessage(session, myEmail, recipient, recipientName, donation);
-
+		System.out.println(message.toString());
 		Transport.send(message);
 		System.out.println("Email sent");
 	}
+	
+	private Session createAuthenticationSession() {
+		return Session.getInstance(properties, new Authenticator() {
+			@Override
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(username, password);
+			}
+		});
+	}
 
-	/**
-	 * Prepare the message to be sent to a recipient. 
-	 * @param session - Pass in the session.
-	 * @param myEmail - The email you're sending from.
-	 * @param recepient - The recipient's email address.
-	 * @param donation - What donation? Subject to change
-	 * @return - A message object if successfull otherwise null.
-	 */
 	private static Message prepareMessage(Session session, String myEmail, 
-			String recipient, String recipientName, String donation) {
+			String recipient, String recipientName) {
 		try {
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(myEmail)); // set from email
 
-			// set the recepient of the email
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
 
-			// handle setting subject, body text
 			message.setSubject("Example email");
 			
-			/**
-			 * Testing sending html content here - works
-			 */
-	/*		String html = "<h1> TESTING </h1> <br/> <h2> <b> Next test </b> </h2>";
-			message.setContent(html, "text/html"); */
-			
 			message.setText("Thank you " + recipientName + " for donating." + "\nWe have received"
-					+ " your donation " + donation);
+					+ " your donation.");
 
 			return message;
 		} catch (Exception e) {
+			System.out.println(e);
 		}
 		return null;
 	}
