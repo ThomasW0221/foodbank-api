@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Properties;
 
-public class MailHandler {
+public class MailHandler implements Runnable{
 	
 	private Properties properties;
 	
@@ -88,6 +88,15 @@ public class MailHandler {
 			System.out.println(e);
 		}
 		return null;
+	}
+
+	@Override
+	public void run() {
+		try {
+			this.sendMail();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

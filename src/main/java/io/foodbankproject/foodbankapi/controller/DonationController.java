@@ -123,7 +123,7 @@ public class DonationController {
 	private void submitMailJob(Donation donation) {
 		MailHandler mailHandler = new MailHandler(donation.getDonorEmail(), donation.getDonorName());
 		try {
-			mailExecutor.submit(new MailHandlerExecutor(mailHandler));
+			mailExecutor.submit(mailHandler);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
