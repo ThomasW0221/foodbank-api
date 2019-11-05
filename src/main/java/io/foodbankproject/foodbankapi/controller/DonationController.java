@@ -112,17 +112,21 @@ public class DonationController {
 		addToInventory(donation.getItemsDonated());
 		
 		if (isEmailPresent(donation)) {
-			MailHandler mailHandler = new MailHandler(donation.getDonorEmail(), donation.getDonorName());
-			try {
-				mailExecutor.submit(new MailHandlerExecutor(mailHandler));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			submitMailJob(donation);
 		}
 	}
 	
 	private boolean isEmailPresent(Donation donation) {
 		return donation.getDonorEmail() != null;
+	}
+	
+	private void submitMailJob(Donation donation) {
+		MailHandler mailHandler = new MailHandler(donation.getDonorEmail(), donation.getDonorName());
+		try {
+			mailExecutor.submit(new MailHandlerExecutor(mailHandler));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void addToInventory(List<Item> itemList) {
