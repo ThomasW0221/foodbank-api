@@ -2,6 +2,8 @@ package io.foodbankproject.foodbankapi.controller;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,7 @@ import io.foodbankproject.foodbankapi.entity.InventoryItem;
 import io.foodbankproject.foodbankapi.entity.InventoryItemWrapper;
 import io.foodbankproject.foodbankapi.entity.Item;
 import io.foodbankproject.foodbankapi.mail.MailHandler;
+import io.foodbankproject.foodbankapi.mail.MailHandlerExecutor;
 import io.foodbankproject.foodbankapi.service.FullDonationService;
 
 @RestController
@@ -29,8 +31,8 @@ public class DonationController {
 	private FullDonationService fullDonationService;
 	
 	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
-	private MailHandler mail = new MailHandler();
+	
+	private ExecutorService mailExecutor = Executors.newFixedThreadPool(5);
 
 	/**
 	 * 
@@ -101,7 +103,7 @@ public class DonationController {
 	 * @throws Exception 
 	 */
 	@PostMapping("/donations")
-	public void addDonation(@RequestBody Donation donation) throws Exception {
+	public void addDonation(@RequestBody Donation donation) {
 		for (Item item : donation.getItemsDonated()) {
 			item.setDonation(donation);
 		}
@@ -109,8 +111,21 @@ public class DonationController {
 
 		addToInventory(donation.getItemsDonated());
 		
-		if (donation.getDonorEmail() != null) {
-			mail.sendMail(donation.getDonorEmail(), donation.getDonorName(), donation.getDonorName());
+		if (isEmailPresent(donation)) {
+			submitMailJob(donation);
+		}
+	}
+	
+	private boolean isEmailPresent(Donation donation) {
+		return donation.getDonorEmail() != null;
+	}
+	
+	private void submitMailJob(Donation donation) {
+		MailHandler mailHandler = new MailHandler(donation.getDonorEmail(), donation.getDonorName());
+		try {
+			mailExecutor.submit(new MailHandlerExecutor(mailHandler));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
