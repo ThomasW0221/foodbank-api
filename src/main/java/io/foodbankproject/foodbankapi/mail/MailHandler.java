@@ -34,8 +34,8 @@ public class MailHandler {
 		properties.put("mail.smtp.port", "587");
 		this.recipient = recipient;
 		this.recipientName = recipientName;
-		this.username = "unccfoodpantry123@gmail.com";
-		this.password = "pantry123uncc9985";
+		this.username = System.getenv("AUTOMATION_EMAIL_USERNAME");
+		this.password = System.getenv("AUTOMATION_EMAIL_PASSWORD");
 	}
 
 	/**
