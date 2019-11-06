@@ -2,6 +2,8 @@ package io.foodbankproject.foodbankapi.controller;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import io.foodbankproject.foodbankapi.entity.Donation;
 import io.foodbankproject.foodbankapi.entity.InventoryItem;
 import io.foodbankproject.foodbankapi.entity.InventoryItemWrapper;
 import io.foodbankproject.foodbankapi.entity.Item;
+import io.foodbankproject.foodbankapi.mail.MailHandler;
 import io.foodbankproject.foodbankapi.service.FullDonationService;
 
 @RestController
@@ -26,6 +29,8 @@ public class DonationController {
 	private FullDonationService fullDonationService;
 	
 	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+	
+	private ExecutorService mailExecutor = Executors.newFixedThreadPool(5);
 
 	/**
 	 * 
@@ -93,6 +98,7 @@ public class DonationController {
 	 * </p>
 	 * 
 	 * @param donation donation object that is submitted through HTTP POST
+	 * @throws Exception 
 	 */
 	@PostMapping("/donations")
 	public void addDonation(@RequestBody Donation donation) {
@@ -102,6 +108,23 @@ public class DonationController {
 		fullDonationService.saveDonation(donation);
 
 		addToInventory(donation.getItemsDonated());
+		
+		if (isEmailPresent(donation)) {
+			submitMailJob(donation);
+		}
+	}
+	
+	private boolean isEmailPresent(Donation donation) {
+		return donation.getDonorEmail() != null;
+	}
+	
+	private void submitMailJob(Donation donation) {
+		MailHandler mailHandler = new MailHandler(donation.getDonorEmail(), donation.getDonorName());
+		try {
+			mailExecutor.submit(mailHandler);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void addToInventory(List<Item> itemList) {
