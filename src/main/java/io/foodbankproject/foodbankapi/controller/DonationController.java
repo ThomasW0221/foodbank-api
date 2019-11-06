@@ -21,7 +21,6 @@ import io.foodbankproject.foodbankapi.entity.InventoryItem;
 import io.foodbankproject.foodbankapi.entity.InventoryItemWrapper;
 import io.foodbankproject.foodbankapi.entity.Item;
 import io.foodbankproject.foodbankapi.mail.MailHandler;
-import io.foodbankproject.foodbankapi.mail.MailHandlerExecutor;
 import io.foodbankproject.foodbankapi.service.FullDonationService;
 
 @RestController
