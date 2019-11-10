@@ -44,17 +44,9 @@ public class MailHandler implements Runnable{
 	 */
 	public void sendMail() throws Exception {
 
-		System.out.println("Preparing to send email...");
-
 		Session session = createAuthenticationSession();
-		System.out.println(username);
-		System.out.println(recipient);
-		System.out.println(recipientName);
 		Message message = prepareMessage(session, username, recipient, recipientName);
-
-		System.out.println(message.toString());
 		Transport.send(message);
-		System.out.println("Email sent");
 	}
 	
 	private Session createAuthenticationSession() {
