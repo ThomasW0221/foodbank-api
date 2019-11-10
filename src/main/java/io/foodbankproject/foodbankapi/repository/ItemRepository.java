@@ -12,9 +12,9 @@ import io.foodbankproject.foodbankapi.entity.Item;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Integer>{
 
-	@Query(value="SELECT * FROM ITEM WHERE DONATION_ID = :donationId", nativeQuery=true)
+	@Query(value="SELECT * FROM item WHERE donation_id = :donationId", nativeQuery=true)
 	List<Item> findByDonation(Integer donationId);
 	
-	@Query(value="SELECT * FROM ITEM WHERE NAME = :itemName", nativeQuery=true)
+	@Query(value="SELECT * FROM item WHERE name = :itemName", nativeQuery=true)
 	List<Item> findByName(String itemName);
 }
