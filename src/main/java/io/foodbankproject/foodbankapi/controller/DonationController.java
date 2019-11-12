@@ -1,7 +1,9 @@
 package io.foodbankproject.foodbankapi.controller;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -21,6 +23,7 @@ import io.foodbankproject.foodbankapi.entity.InventoryItemWrapper;
 import io.foodbankproject.foodbankapi.entity.Item;
 import io.foodbankproject.foodbankapi.mail.MailHandler;
 import io.foodbankproject.foodbankapi.service.FullDonationService;
+import io.foodbankproject.foodbankapi.util.DonationUtility;
 
 @RestController
 public class DonationController {
@@ -49,45 +52,29 @@ public class DonationController {
 			@RequestParam(name = "donorName", required = false) String donorName,
 			@RequestParam(name = "minWeight", required = false) Integer minWeight,
 			@RequestParam(name = "maxWeight", required = false) Integer maxWeight) {
+		
+		Map<String, Object> queryParams = new HashMap<>();
+		
+		queryParams.put("donationId", donationId);
+		queryParams.put("fromDate", fromDate);
+		queryParams.put("toDate", toDate);
+		queryParams.put("donorName", donorName);
+		queryParams.put("minWeight", minWeight);
+		queryParams.put("maxWeight", maxWeight);
+		
+		DonationUtility donationUtility = new DonationUtility(queryParams);
 
-		return getDonationsHelper(donationId, fromDate, toDate, donorName, minWeight, maxWeight);
+		return getDonations(donationUtility);
 
 	}
 
-	private ResponseEntity<?> getDonationsHelper(Integer donationId, String fromDate, String toDate, String donorName,
-			Integer minWeight, Integer maxWeight) {
+	private ResponseEntity<?> getDonations(DonationUtility donationUtility) {
 		lock.readLock().lock();
 		try {
-			if (donationId != null) { // donation id passed in
-				if (fullDonationService.donationExistsById(donationId)) {
-					return ResponseEntity.ok(fullDonationService.donationFindById(donationId));
-				} else {
-					return ResponseEntity.notFound().build();
-				}
-			} else if (donorName != null && fromDate != null) { // donor name and from date passed in
-				if (toDate != null) { // donor name with to date and from date
-					return ResponseEntity.ok(fullDonationService.donationFindByNameFromDateAndToDate(donorName, fromDate, toDate));
-				}
-				return ResponseEntity.ok(fullDonationService.donationFindByNameAndFromDate(donorName, fromDate));
-			} else if (donorName != null) { // just donor name passed in
-				return ResponseEntity.ok(fullDonationService.donationFindByName(donorName));
-			} else if (fromDate != null) { // from date passed in
-				if (toDate != null) { // from date and to date passed in
-					return ResponseEntity.ok(fullDonationService.donationFindByFromAndToDate(fromDate, toDate));
-				}
-				return ResponseEntity.ok(fullDonationService.donationFindByFromDate(fromDate));
-			} else if (minWeight != null && maxWeight != null) { // min and max weight passed in
-				return ResponseEntity.ok(fullDonationService.donationFindByWeightRange(minWeight, maxWeight));
-			} else {
-				LocalDateTime time = LocalDateTime.now();
-				time = time.minusDays(30);
-				String timeString = String.format("%04d-%02d-%02d", time.getYear(), time.getMonthValue(), time.getDayOfMonth());
-				return ResponseEntity.ok(fullDonationService.donationFindByFromDate(timeString));
-			}
+			return donationUtility.performDonationGet();
 		} finally {
 			lock.readLock().unlock();
 		}
-		
 	}
 
 	/**
