@@ -9,26 +9,26 @@ import io.foodbankproject.foodbankapi.entity.Donation;
 
 public interface DonationRepository extends JpaRepository<Donation, Integer>{
 
-	@Query(value="SELECT * FROM DONATION WHERE DATE_RECEIVED >= :fromDate AND DATE_RECEIVED <= CURDATE()",
+	@Query(value="SELECT * FROM donation WHERE date_received >= :fromDate AND date_received <= CURDATE()",
 			nativeQuery=true)
 	List<Donation> findByFromDate(String fromDate);
 
-	@Query(value="SELECT * FROM DONATION WHERE DATE_RECEIVED >= :fromDate AND DATE_RECEIVED <= :toDate",
+	@Query(value="SELECT * FROM donation WHERE date_received >= :fromDate AND date_received <= :toDate",
 			nativeQuery=true)
 	List<Donation> findByFromAndToDate(String fromDate, String toDate);
 	
-	@Query(value="SELECT * FROM DONATION WHERE DATE_RECEIVED >= :fromDate AND DATE_RECEIVED <= CURDATE() AND DONOR_NAME = :name",
+	@Query(value="SELECT * FROM donation WHERE date_received >= :fromDate AND date_received <= CURDATE() AND donor_name = :name",
 			nativeQuery=true)
 	List<Donation> findByNameAndFromDate(String name, String fromDate);
 	
-	@Query(value="SELECT * FROM DONATION WHERE DATE_RECEIVED >= :fromDate AND DATE_RECEIVED <= :toDate AND DONOR_NAME = :name",
+	@Query(value="SELECT * FROM donation WHERE date_received >= :fromDate AND date_received <= :toDate AND donor_name = :name",
 			nativeQuery=true)
 	List<Donation> findByNameFromDateAndToDate(String name, String fromDate, String toDate);
 
-	@Query(value="SELECT * FROM DONATION WHERE DONOR_NAME = :donorName", nativeQuery=true)
+	@Query(value="SELECT * FROM donation WHERE donor_name = :donorName", nativeQuery=true)
 	List<Donation> findByName(String donorName);
 
-	@Query(value="SELECT * FROM DONATION WHERE DONATION_WEIGHT >= :minWeight AND DONATION_WEIGHT <= :maxWeight",
+	@Query(value="SELECT * FROM donation WHERE donation_weight >= :minWeight AND donation_weight <= :maxWeight",
 			nativeQuery=true)
 	List<Donation> findByWeightRange(Integer minWeight, Integer maxWeight);
 }
