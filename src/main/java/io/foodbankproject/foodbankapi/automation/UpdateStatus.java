@@ -1,28 +1,35 @@
 package io.foodbankproject.foodbankapi.automation;
 
+import java.time.LocalDateTime;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
-import twitter4j.auth.AccessToken;
 
-
-public class UpdateStatus{
+@Component
+public class UpdateStatus{	
 	
-	public static void main(String[] args) {
+	TwitterFactory ourTwitterFactory;
+	Twitter twitterInstance;
+	LocalDateTime ldt = LocalDateTime.now();
+	
+	@Autowired
+	public UpdateStatus(TwitterFactory twitterFactory) {
+		ourTwitterFactory = twitterFactory;
+		twitterInstance = twitterFactory.getInstance();
+	}
+	
+	@Scheduled(fixedRate=5000)
+	public void testTweet() {
 		try {
-			Twitter twitter = new TwitterFactory().getInstance();
-
-			twitter.setOAuthConsumer(TwitterProperties.getConsumerKey(), TwitterProperties.getConsumerSecret());
-			AccessToken accessToken = new AccessToken(TwitterProperties.getAccessToken(),
-					TwitterProperties.getAccessTokenSecret());
-
-			twitter.setOAuthAccessToken(accessToken);
-
-			twitter.updateStatus("Testing part 4");
-
-			System.out.println("Successfully updated the status in Twitter.");
-		} catch (TwitterException te) {
-			te.printStackTrace();
+			twitterInstance.updateStatus(ldt.toString());
+			ldt = ldt.plusDays(1);
+		} catch (TwitterException e) {
+			e.printStackTrace();
 		}
-	}	
+	}
 }

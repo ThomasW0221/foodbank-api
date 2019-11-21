@@ -13,10 +13,10 @@ public class TwitterSourceConfiguration {
 	public TwitterFactory twitterFactory() {
 		ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
 		configurationBuilder.setDebugEnabled(true)
-				.setOAuthConsumerKey(TwitterProperties.getConsumerKey())
-				.setOAuthConsumerSecret(TwitterProperties.getConsumerSecret())
-				.setOAuthAccessToken(TwitterProperties.getAccessToken())
-				.setOAuthAccessTokenSecret(TwitterProperties.getAccessTokenSecret());
+				.setOAuthConsumerKey(System.getenv("TWITTER_CONSUMER_KEY"))
+				.setOAuthConsumerSecret(System.getenv("TWITTER_CONSUMER_SECRET"))
+				.setOAuthAccessToken(System.getenv("TWITTER_ACCESS_TOKEN"))
+				.setOAuthAccessTokenSecret(System.getenv("TWITTER_ACCESS_SECRET"));
 		return new TwitterFactory(configurationBuilder.build());
 	}
 }
