@@ -28,6 +28,7 @@ public class UpdateStatus implements SocialMediaPoster {
 		this.fullDonationService = fullDonationService;
 	}
 	
+	@Override
 	@Scheduled(cron="0 18 * * 1-5")
 	public void makePost() {
 		LocalDateTime today = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
