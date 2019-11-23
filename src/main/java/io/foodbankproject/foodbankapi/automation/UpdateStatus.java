@@ -15,7 +15,7 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 
 @Component
-public class UpdateStatus{	
+public class UpdateStatus implements SocialMediaPoster {	
 	
 	TwitterFactory ourTwitterFactory;
 	Twitter twitterInstance;
@@ -29,14 +29,7 @@ public class UpdateStatus{
 	}
 	
 	@Scheduled(cron="0 18 * * 1-5")
-	public void testTweet() {
-//		try {
-//			twitterInstance.updateStatus(ldt.toString());
-//			ldt = ldt.plusDays(1);
-//		} catch (TwitterException e) {
-//			e.printStackTrace();
-//		}
-		
+	public void makePost() {
 		LocalDateTime today = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
 		String todayString = today.toString();
 		List<Donation> todaysDonations = getTodaysDonations(todayString);
