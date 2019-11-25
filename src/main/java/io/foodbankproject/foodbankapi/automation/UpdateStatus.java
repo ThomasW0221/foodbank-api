@@ -29,7 +29,7 @@ public class UpdateStatus implements SocialMediaPoster {
 	}
 	
 	@Override
-	@Scheduled(cron="0 0 18 ? * MON-FRI *")
+	@Scheduled(cron="0 0 18 ? * MON-FRI")
 	public void makePost() {
 		LocalDateTime today = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
 		String todayString = today.toString();
