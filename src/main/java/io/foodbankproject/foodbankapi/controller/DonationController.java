@@ -6,6 +6,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +51,7 @@ public class DonationController {
 			@RequestParam(name = "donorName", required = false) String donorName,
 			@RequestParam(name = "minWeight", required = false) Integer minWeight,
 			@RequestParam(name = "maxWeight", required = false) Integer maxWeight) {
+		
 
 		return getDonationsHelper(donationId, fromDate, toDate, donorName, minWeight, maxWeight);
 
@@ -233,6 +236,14 @@ public class DonationController {
 			}
 		} finally {
 			lock.readLock().unlock();
+		}
+		
+	}
+	
+	@PostMapping("/csv")
+	public void donationsToCsv(@RequestBody List<Donation> donations, HttpServletResponse response) {
+		for (Donation donation: donations) {
+			
 		}
 		
 	}
