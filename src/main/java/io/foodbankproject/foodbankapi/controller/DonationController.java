@@ -1,6 +1,7 @@
 package io.foodbankproject.foodbankapi.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -247,7 +248,7 @@ public class DonationController {
 	
 	@PostMapping("/csv")
 	public void donationsToCsv(@RequestBody List<Donation> donations, HttpServletResponse response) {
-        String filename = "data.csv";
+        String filename = "donation.csv";
 
         response.setContentType("text/csv");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
@@ -264,18 +265,38 @@ public class DonationController {
         
         writer.write(donations);
         
-        } catch (Exception e) {
-        	e.printStackTrace();
+        String filename1 = "items.csv";
+
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename1=\"" + filename1 + "\"");
+		      
+        StatefulBeanToCsv<Item> writer1 = new StatefulBeanToCsvBuilder<Item>(response.getWriter())
+                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+                .withOrderedResults(false)
+                .build();
+ 
+        ArrayList<Item> itemList = new ArrayList<Item>();
+        
+        for (Donation x1 : donations) {
+        	itemList.addAll(x1.getItemsDonated());
         }
+        
+        writer1.write(itemList);
+        
         
     //    for (Book aBook : listBooks) {
     //        csvWriter.write(aBook, header);
     //    }
                 
-		for (Donation donation: donations) {
-			donation.getItemsDonated();
-		}
-		
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+	
 	}
+
+		
+        
 
 }
