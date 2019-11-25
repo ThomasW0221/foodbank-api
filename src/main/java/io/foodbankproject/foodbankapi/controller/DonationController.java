@@ -9,6 +9,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
 
 import io.foodbankproject.foodbankapi.entity.Donation;
 import io.foodbankproject.foodbankapi.entity.InventoryItem;
@@ -242,8 +247,33 @@ public class DonationController {
 	
 	@PostMapping("/csv")
 	public void donationsToCsv(@RequestBody List<Donation> donations, HttpServletResponse response) {
+        String filename = "data.csv";
+
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + filename + "\"");
+		      
+        try {
+        StatefulBeanToCsv<Donation> writer = new StatefulBeanToCsvBuilder<Donation>(response.getWriter())
+                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+                .withOrderedResults(false)
+                .build();
+ 
+ 
+        
+        writer.write(donations);
+        
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+        
+    //    for (Book aBook : listBooks) {
+    //        csvWriter.write(aBook, header);
+    //    }
+                
 		for (Donation donation: donations) {
-			
+			donation.getItemsDonated();
 		}
 		
 	}
