@@ -248,48 +248,43 @@ public class DonationController {
 	
 	@PostMapping("/csv")
 	public void donationsToCsv(@RequestBody List<Donation> donations, HttpServletResponse response) {
-        String filename = "donation.csv";
+        String donationsFileName = "donation.csv";
 
         response.setContentType("text/csv");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + filename + "\"");
+                "attachment; filename=\"" + donationsFileName + "\"");
 		      
         try {
-        StatefulBeanToCsv<Donation> writer = new StatefulBeanToCsvBuilder<Donation>(response.getWriter())
-                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
-                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
-                .withOrderedResults(false)
-                .build();
- 
- 
-        
-        writer.write(donations);
-        
-        String filename1 = "items.csv";
-
-        response.setContentType("text/csv");
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename1=\"" + filename1 + "\"");
-		      
-        StatefulBeanToCsv<Item> writer1 = new StatefulBeanToCsvBuilder<Item>(response.getWriter())
-                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
-                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
-                .withOrderedResults(false)
-                .build();
- 
-        ArrayList<Item> itemList = new ArrayList<Item>();
-        
-        for (Donation x1 : donations) {
-        	itemList.addAll(x1.getItemsDonated());
-        }
-        
-        writer1.write(itemList);
-        
-        
-    //    for (Book aBook : listBooks) {
-    //        csvWriter.write(aBook, header);
-    //    }
-                
+	        StatefulBeanToCsv<Donation> donationWriter = new StatefulBeanToCsvBuilder<Donation>(response.getWriter())
+	                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+	                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+	                .withOrderedResults(false)
+	                .build();
+	 
+	 
+	        
+	        donationWriter.write(donations);
+	        
+	        String itemsFileName = "items.csv";
+	
+	        response.setContentType("text/csv");
+	        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+	                "attachment; filename1=\"" + itemsFileName + "\"");
+			      
+	        StatefulBeanToCsv<Item> itemsWriter = new StatefulBeanToCsvBuilder<Item>(response.getWriter())
+	                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+	                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+	                .withOrderedResults(false)
+	                .build();
+	 
+	        ArrayList<Item> itemList = new ArrayList<Item>();
+	        
+	        for (Donation x1 : donations) {
+	        	itemList.addAll(x1.getItemsDonated());
+	        }
+	        
+	        itemsWriter.write(itemList);
+     
         } catch (Exception e) {
         	e.printStackTrace();
         }
