@@ -23,6 +23,7 @@ import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 
+import io.foodbankproject.foodbankapi.csvHandler.DonationHolder;
 import io.foodbankproject.foodbankapi.entity.Donation;
 import io.foodbankproject.foodbankapi.entity.InventoryItem;
 import io.foodbankproject.foodbankapi.entity.InventoryItemWrapper;
@@ -253,9 +254,16 @@ public class DonationController {
         response.setContentType("text/csv");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + donationsFileName + "\"");
+        
+        List<DonationHolder> modifiedDonations = new ArrayList<>();
+        
+        for(Donation donation: donations) {
+        	DonationHolder holder = new DonationHolder(donation);
+        	modifiedDonations.add(holder);
+        }
 		      
         try {
-	        StatefulBeanToCsv<Donation> donationWriter = new StatefulBeanToCsvBuilder<Donation>(response.getWriter())
+	        StatefulBeanToCsv<DonationHolder> donationWriter = new StatefulBeanToCsvBuilder<DonationHolder>(response.getWriter())
 	                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
 	                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
 	                .withOrderedResults(false)
@@ -263,7 +271,7 @@ public class DonationController {
 	 
 	 
 	        
-	        donationWriter.write(donations);
+	        donationWriter.write(modifiedDonations);
 	        
 //	        String itemsFileName = "items.csv";
 //	
