@@ -189,7 +189,7 @@ public class DonationController {
 				if(fullDonationService.inventoryItemExistsById(item.getFoodItemName())) {
 					InventoryItem itemToModify = fullDonationService.inventoryItemFindById(item.getFoodItemName());
 					int newQuantity = itemToModify.getFoodItemQuantity() - item.getFoodItemQuantity();
-					if(newQuantity == 0) {
+					if(newQuantity <= 0) {
 						fullDonationService.deleteInventoryItem(itemToModify);
 						continue;
 					}
