@@ -1,6 +1,7 @@
 package io.foodbankproject.foodbankapi.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -60,7 +61,9 @@ public class DonationController {
 		try {
 			if (donationId != null) { // donation id passed in
 				if (fullDonationService.donationExistsById(donationId)) {
-					return ResponseEntity.ok(fullDonationService.donationFindById(donationId));
+					List<Donation> response = new ArrayList<>();
+					response.add(fullDonationService.donationFindById(donationId));
+					return ResponseEntity.ok(response);
 				} else {
 					return ResponseEntity.notFound().build();
 				}
