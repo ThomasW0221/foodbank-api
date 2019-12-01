@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
-
 @Configuration
 public class TwitterSourceConfiguration {
 
@@ -19,4 +18,4 @@ public class TwitterSourceConfiguration {
 				.setOAuthAccessTokenSecret(System.getenv("TWITTER_ACCESS_SECRET"));
 		return new TwitterFactory(configurationBuilder.build());
 	}
-} 
+}
