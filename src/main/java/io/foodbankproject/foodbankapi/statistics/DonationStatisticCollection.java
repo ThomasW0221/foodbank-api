@@ -10,12 +10,12 @@ public class DonationStatisticCollection {
 	
 	private double avgWeight;
 	
-	private String mostRecentDonor;
+	private double totalWeight;
 	
 	private String mostDonatedItem;
 	
 	private int numberOfItemsDonated;
-
+	
 	public DonationStatisticCollection() {
 		
 	}
@@ -52,14 +52,6 @@ public class DonationStatisticCollection {
 		this.avgWeight = avgWeight;
 	}
 
-	public String getMostRecentDonor() {
-		return mostRecentDonor;
-	}
-
-	public void setMostRecentDonor(String mostRecentDonor) {
-		this.mostRecentDonor = mostRecentDonor;
-	}
-
 	public String getMostDonatedItem() {
 		return mostDonatedItem;
 	}
@@ -75,4 +67,13 @@ public class DonationStatisticCollection {
 	public void setNumberOfItemsDonated(int numberOfItemsDonated) {
 		this.numberOfItemsDonated = numberOfItemsDonated;
 	}
+
+	public double getTotalWeight() {
+		return totalWeight;
+	}
+
+	public void setTotalWeight(double totalWeight) {
+		this.totalWeight = totalWeight;
+	}
+	
 }
