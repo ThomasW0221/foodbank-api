@@ -2,10 +2,7 @@ package io.foodbankproject.foodbankapi.statistics;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import io.foodbankproject.foodbankapi.entity.Donation;
-import io.foodbankproject.foodbankapi.service.FullDonationService;
 
 public class DonationStatisticsCalculator implements StatisticsCalculator {
 	
@@ -17,7 +14,9 @@ public class DonationStatisticsCalculator implements StatisticsCalculator {
 
 	public DonationStatisticCollection computeStatistics() {
 		DonationStatisticCollection statCollection = new DonationStatisticCollection();
-		
+		for(Donation donation : donations) {
+			
+		}
 		
 		return statCollection;
 	}

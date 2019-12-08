@@ -24,6 +24,7 @@ import io.foodbankproject.foodbankapi.mail.MailHandler;
 import io.foodbankproject.foodbankapi.service.FullDonationService;
 import io.foodbankproject.foodbankapi.statistics.DonationStatisticCollection;
 import io.foodbankproject.foodbankapi.statistics.DonationStatisticsCalculator;
+import io.foodbankproject.foodbankapi.statistics.StatisticsCalculator;
 
 @RestController
 public class DonationController {
@@ -246,7 +247,7 @@ public class DonationController {
 	public ResponseEntity<DonationStatisticCollection> getStatistics(@RequestParam(name="fromDate", required=true) String fromDate,
 			@RequestParam(name="toDate", required=true) String toDate){
 		List<Donation> donationsForStats = fullDonationService.donationFindByFromAndToDate(fromDate, toDate);
-		DonationStatisticsCalculator statCalculator = new DonationStatisticsCalculator(donationsForStats);
+		StatisticsCalculator statCalculator = new DonationStatisticsCalculator(donationsForStats);
 		DonationStatisticCollection statCollection = statCalculator.computeStatistics();
 		
 		return ResponseEntity.ok(statCollection);
